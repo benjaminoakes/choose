@@ -315,7 +315,6 @@
 
         // --- Settings Logic ---
         function openSettings() {
-            // Populate inputs with current names
             name1Input.value = mommyLi.textContent;
             name2Input.value = daddyLi.textContent;
             name3Input.value = kiddoLi.textContent;
@@ -327,16 +326,38 @@
         }
         
         function saveSettings() {
-            mommyLi.textContent = name1Input.value.trim() || 'Name 1';
-            daddyLi.textContent = name2Input.value.trim() || 'Name 2';
-            kiddoLi.textContent = name3Input.value.trim() || 'Name 3';
+            const newName1 = name1Input.value.trim() || 'Name 1';
+            const newName2 = name2Input.value.trim() || 'Name 2';
+            const newName3 = name3Input.value.trim() || 'Name 3';
+
+            // Update the UI
+            mommyLi.textContent = newName1;
+            daddyLi.textContent = newName2;
+            kiddoLi.textContent = newName3;
+
+            // Save to localStorage
+            localStorage.setItem('turnSelectorName1', newName1);
+            localStorage.setItem('turnSelectorName2', newName2);
+            localStorage.setItem('turnSelectorName3', newName3);
+
             closeSettings();
         }
+        
+        // --- Load names from storage on startup ---
+        function loadNamesFromStorage() {
+            const name1 = localStorage.getItem('turnSelectorName1');
+            const name2 = localStorage.getItem('turnSelectorName2');
+            const name3 = localStorage.getItem('turnSelectorName3');
 
+            if (name1) { mommyLi.textContent = name1; }
+            if (name2) { daddyLi.textContent = name2; }
+            if (name3) { kiddoLi.textContent = name3; }
+        }
+
+        // --- Event Listeners ---
         settingsButton.addEventListener('click', openSettings);
         closeSettingsBtn.addEventListener('click', closeSettings);
         saveSettingsBtn.addEventListener('click', saveSettings);
-        // Also close if clicking the dark background
         settingsOverlay.addEventListener('click', (event) => {
             if (event.target === settingsOverlay) {
                 closeSettings();
@@ -367,11 +388,8 @@
                 const targetElement = nameElements[currentIndex];
                 const targetPosition = targetElement.offsetTop + (targetElement.offsetHeight / 2) - (arrow.offsetHeight / 2);
                 arrow.style.top = `${targetPosition}px`;
-
                 currentIndex = (currentIndex + 1) % nameElements.length;
-                
                 const elapsedTime = Date.now() - startTime;
-                
                 if (elapsedTime < totalAnimationTime) {
                     if (elapsedTime > (totalAnimationTime - 1500)) {
                          animationInterval *= 1.15;
@@ -386,7 +404,6 @@
                  clearTimeout(animationTimeout);
                  const finalPosition = winnerElement.offsetTop + (winnerElement.offsetHeight / 2) - (arrow.offsetHeight / 2);
                  arrow.style.top = `${finalPosition}px`;
-
                  setTimeout(() => {
                     winnerElement.classList.add('selected');
                     resultDisplay.textContent = `${winnerElement.textContent}'s turn!`;
@@ -399,7 +416,12 @@
             
             animateArrow();
         });
+        
+        // --- Initialize App ---
+        loadNamesFromStorage();
+
     </script>
 
 </body>
 </html>
+
